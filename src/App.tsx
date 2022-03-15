@@ -1,10 +1,12 @@
-import Circle from "./Circle";
+// import Circle from "./Circle";
+import InputUserName from "./InputUserName";
 function App() {
   return (
     <>
       <div>
-        <Circle bgColor="teal" borderColor="royalblue" text="Hi" />
-        <Circle bgColor="tomato" />
+        {/* <Circle bgColor="teal" borderColor="royalblue" text="Hi" />
+        <Circle bgColor="tomato" /> */}
+        <InputUserName />
       </div>
     </>
   );
