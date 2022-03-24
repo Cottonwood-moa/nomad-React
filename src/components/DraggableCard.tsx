@@ -5,18 +5,20 @@ interface IProps {
   todo: string;
   index: number;
 }
-const Card = styled.div`
+const Card = styled.div<{ isDragging: boolean }>`
   border-radius: 5px;
   padding: 10px 10px;
   margin-bottom: 5px;
-  background-color: ${(props) => props.theme.cardColor};
+  background-color: ${(props) =>
+    props.isDragging ? "orange" : (props) => props.theme.cardColor};
 `;
 
 function DraggableCard({ todo, index }: IProps) {
   return (
     <Draggable draggableId={todo} index={index}>
-      {(magic) => (
+      {(magic, snapshot) => (
         <Card
+          isDragging={snapshot.isDragging}
           ref={magic.innerRef}
           {...magic.dragHandleProps}
           {...magic.draggableProps}

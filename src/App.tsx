@@ -1,29 +1,18 @@
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from "./atoms";
-import DraggableCard from "./components/DraggableCard";
+import Board from "./components/Board";
 const Boards = styled.div`
   display: grid;
+  gap: 10px;
   width: 100%;
   grid-template-columns: repeat(3, 1fr);
-`;
-const Board = styled.div`
-  padding: 20px 10px;
-  padding-top: 30px;
-  background-color: ${(props) => props.theme.boardColor};
-  border-radius: 5px;
-  min-height: 200px;
 `;
 
 const Wrapper = styled.div`
   display: flex;
-  max-width: 480px;
+  max-width: 1000px;
   width: 100%;
   margin: 0 auto;
   justify-content: center;
@@ -33,13 +22,46 @@ const Wrapper = styled.div`
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  //   {
+  //     "draggableId": "C",
+  //     "type": "DEFAULT",
+  //     "source": {
+  //         "index": 2,
+  //         "droppableId": "Doing"
+  //     },
+  //     "reason": "DROP",
+  //     "mode": "FLUID",
+  //     "destination": {
+  //         "droppableId": "Done",
+  //         "index": 2
+  //     },
+  //     "combine": null
+  // }
   const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
-    if (!destination) return;
     setToDos((prev) => {
-      const prevToDos = [...prev];
-      prevToDos.splice(source.index, 1);
-      prevToDos.splice(destination?.index, 0, draggableId);
-      return prevToDos;
+      if (destination?.droppableId === source.droppableId) {
+        const boardCopy = [...prev[source.droppableId]];
+        boardCopy.splice(source.index, 1);
+        boardCopy.splice(destination?.index, 0, draggableId);
+        return {
+          ...prev,
+          [source.droppableId]: boardCopy,
+        };
+      } else if (destination?.droppableId !== source.droppableId) {
+        // 이전 보드에서 드래그 된걸 자른다.
+        const souceBoard = [...prev[source.droppableId]];
+        souceBoard.splice(source.index, 1);
+        // 목적 보드에서 드래그 된걸 추가한다.
+        if (!destination) return prev;
+        const destinationBoard = [...prev[destination?.droppableId]];
+        destinationBoard.splice(destination?.index, 0, draggableId);
+        return {
+          ...prev,
+          [source.droppableId]: souceBoard,
+          [destination.droppableId]: destinationBoard,
+        };
+      }
+      return prev;
     });
   };
   // ...magic.dragHandleProps 드래그 트리거
@@ -48,16 +70,9 @@ function App() {
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
         <Boards>
-          <Droppable droppableId="one">
-            {(magic) => (
-              <Board ref={magic.innerRef} {...magic.droppableProps}>
-                {toDos.map((todo, index) => (
-                  <DraggableCard key={todo} todo={todo} index={index} />
-                ))}
-                {magic.placeholder}
-              </Board>
-            )}
-          </Droppable>
+          {Object.keys(toDos).map((boardId) => (
+            <Board key={boardId} boardId={boardId} toDos={toDos[boardId]} />
+          ))}
         </Boards>
       </Wrapper>
     </DragDropContext>
