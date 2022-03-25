@@ -2,7 +2,8 @@ import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import styled from "styled-components";
 interface IProps {
-  todo: string;
+  todoId: number;
+  todoText: string;
   index: number;
 }
 const Card = styled.div<{ isDragging: boolean }>`
@@ -13,9 +14,9 @@ const Card = styled.div<{ isDragging: boolean }>`
     props.isDragging ? "orange" : (props) => props.theme.cardColor};
 `;
 
-function DraggableCard({ todo, index }: IProps) {
+function DraggableCard({ todoId, index, todoText }: IProps) {
   return (
-    <Draggable draggableId={todo} index={index}>
+    <Draggable draggableId={todoId + ""} index={index}>
       {(magic, snapshot) => (
         <Card
           isDragging={snapshot.isDragging}
@@ -23,7 +24,7 @@ function DraggableCard({ todo, index }: IProps) {
           {...magic.dragHandleProps}
           {...magic.draggableProps}
         >
-          {todo}
+          {todoText}
         </Card>
       )}
     </Draggable>
