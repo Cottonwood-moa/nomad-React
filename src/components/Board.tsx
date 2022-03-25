@@ -1,4 +1,5 @@
 import { Droppable } from "react-beautiful-dnd";
+import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import DraggableCard from "./DraggableCard";
 const Wrapper = styled.div`
@@ -35,7 +36,11 @@ interface IBoardProps {
   toDos: string[];
   boardId: string;
 }
+interface IForm {
+  toDo: string;
+}
 function Board({ toDos, boardId }: IBoardProps) {
+  const {} = useForm<IForm>();
   return (
     <Wrapper>
       <Title>{boardId}</Title>
