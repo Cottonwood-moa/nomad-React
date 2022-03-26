@@ -42,18 +42,14 @@ function App() {
       console.log(info);
       setToDos((prev) => {
         const copy = { ...prev };
-        // console.log(copy);
-        // console.log(destination.index);
         const copyKeys = Object.keys(copy);
         // grab obj
         const grabObj = copy[draggableId];
         // drop 지점의 obj
         const desKey = copyKeys[destination.index];
         const desObj = copy[desKey];
-        console.log(grabObj, desObj);
-        // console.log(copy);
-        // console.log(copy[draggableId]);
-        // console.log(copy[destination?.index]);
+        delete copy[draggableId];
+        console.log(copy);
         return prev;
       });
     }
