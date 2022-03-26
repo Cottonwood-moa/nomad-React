@@ -1,7 +1,6 @@
-import { useEffect } from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { IToDo, toDoState } from "../atoms";
 import DraggableCard from "./DraggableCard";
@@ -9,17 +8,24 @@ const Wrapper = styled.div`
   padding: 0px 10px 20px 10px;
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 5px;
-  width: 30rem;
+  width: 15rem;
   margin: 1rem;
   min-height: 400px;
   display: flex;
   flex-direction: column;
 `;
 const Title = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem;
   color: ${(props) => props.theme.textColor};
   font-weight: bold;
   text-align: center;
+  span {
+    font-size: 24px;
+    cursor: pointer;
+  }
 `;
 interface IArea {
   isDraggingOver: boolean;
@@ -52,9 +58,8 @@ interface IForm {
   toDo: string;
 }
 function Board({ toDos, boardId, index }: IBoardProps) {
-  const test = useRecoilValue(toDoState);
   const setTodos = useSetRecoilState(toDoState);
-  const { register, setValue, handleSubmit, reset } = useForm<IForm>();
+  const { register, handleSubmit, reset } = useForm<IForm>();
   const onValid = ({ toDo }: IForm) => {
     const newToDo = {
       id: Date.now(),
@@ -68,12 +73,20 @@ function Board({ toDos, boardId, index }: IBoardProps) {
     });
     reset();
   };
-  useEffect(() => {}, [test]);
+  const boardDelete = (boardId: string) => {
+    setTodos((prev) => {
+      const result = { ...prev };
+      delete result[boardId];
+      return result;
+    });
+  };
   return (
     <Draggable draggableId={boardId} index={index}>
       {(magic, snapshot) => (
         <Wrapper ref={magic.innerRef} {...magic.draggableProps}>
-          <Title {...magic.dragHandleProps}>{boardId}</Title>
+          <Title {...magic.dragHandleProps}>
+            {boardId} <span onClick={() => boardDelete(boardId)}>&times;</span>
+          </Title>
           <Form onSubmit={handleSubmit(onValid)}>
             <input
               {...register("toDo", {
